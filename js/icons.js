@@ -82,5 +82,53 @@
       var rc = rough.svg(svg);
       svg.appendChild(rc.line(3, 5, 57, 5, { roughness: 0.9, stroke: inkColor, strokeWidth: 1.4, bowing: 2.5, seed: 101 }));
     });
+
+    /* ---- Story-tab glyphs (24x24, hand-drawn) --------------------- *
+     * Drawn with stroke "currentColor" so CSS tints them: muted by
+     * default, ink when the tab is selected. Registry is keyed by the
+     * tab's data-icon, so new story tabs (e.g. Gojek) just add a draw fn.
+     * -------------------------------------------------------------- */
+    var CC = "currentColor";
+    var St = function (seed, w, bow) { return { roughness: 1.1, stroke: CC, strokeWidth: w || 1.5, bowing: bow == null ? 1.1 : bow, seed: seed || 1 }; };
+    var Fill = function (seed) { return { roughness: 0.9, stroke: CC, strokeWidth: 0.5, fill: CC, fillStyle: "solid", seed: seed || 1 }; };
+
+    var tabIcons = {
+      // referral: a $5 banknote ("$5 for you, $5 for them" -> the referral reward)
+      referral: function (rc, add, svg) {
+        // bill body
+        add(rc.rectangle(2.5, 6, 19, 12, St(202, 1.5)));
+        // centre medallion
+        add(rc.circle(12, 12, 6.4, St(203, 1.4)));
+        // tiny corner ticks (the "5" denomination marks on a note)
+        add(rc.line(4.4, 8, 6, 8, St(204, 1.2, 0)));
+        add(rc.line(18, 16, 19.6, 16, St(205, 1.2, 0)));
+        // crisp "$5" in the medallion (font + colour come from CSS)
+        var t = document.createElementNS(SVGNS, "text");
+        t.setAttribute("x", "12"); t.setAttribute("y", "12.4");
+        t.setAttribute("text-anchor", "middle");
+        t.setAttribute("dominant-baseline", "central");
+        t.setAttribute("class", "tab-ico-txt");
+        t.textContent = "$5";
+        svg.appendChild(t);
+      },
+      // merchant: a storefront with a scalloped awning and a door (the business you pay)
+      merchant: function (rc, add) {
+        // awning
+        add(rc.path("M3 8 L21 8 L19.5 4.5 L4.5 4.5 Z", St(211, 1.4)));
+        add(rc.path("M4.5 8 Q6 10.4 7.5 8 Q9 10.4 10.5 8 Q12 10.4 13.5 8 Q15 10.4 16.5 8 Q18 10.4 19.5 8", St(212, 1.2, 0.5)));
+        // shop body
+        add(rc.rectangle(4.5, 8, 15, 12, St(213, 1.5)));
+        // door
+        add(rc.rectangle(10, 13, 4, 7, St(214, 1.3)));
+        add(rc.circle(12.9, 16.7, 0.7, Fill(215)));
+      }
+    };
+
+    Array.prototype.forEach.call(document.querySelectorAll(".pop__tab-ico[data-icon]"), function (svg) {
+      var fn = tabIcons[svg.getAttribute("data-icon")];
+      if (!fn) return;
+      var rc = rough.svg(svg);
+      fn(rc, function (node) { svg.appendChild(node); }, svg);
+    });
   }
 })();

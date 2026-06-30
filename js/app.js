@@ -90,109 +90,118 @@
     });
   }
 
-  /* ---- Story highlight popovers ---------------------------------- *
+  /* ---- Story highlight drawer ------------------------------------ *
    * Each .hl button references a .pop card (by data-pop -> #pop-<id>).
-   * The same card can be referenced by more than one highlight; we move
-   * each card to <body> once, then position it per click. One open at a
-   * time; close on the card's button, click-away, Esc, or scroll/resize.
+   * Clicking a highlight slides a right-side drawer in and moves that
+   * card into it; the same card can be referenced by several highlights.
+   * Close on the drawer's button, backdrop click, or Esc. Anchored to
+   * the screen, so depth content never overflows or jumps.
    * --------------------------------------------------------------- */
   (function () {
     var hls = Array.prototype.slice.call(document.querySelectorAll(".hl[data-pop]"));
-    if (!hls.length) return;
-    var GAP = 10;          // space between highlight and card
-    var EDGE = 12;         // viewport edge padding
-    var openPop = null;    // currently-open .pop
+    var drawer = document.getElementById("story-drawer");
+    if (!hls.length || !drawer) return;
+    var panel = drawer.querySelector(".drawer__panel");
+    var store = document.querySelector(".pop-store");
+    var openCard = null;   // .pop currently shown in the drawer
     var openHl = null;     // highlight that opened it
-    var isMobile = function () { return window.matchMedia("(max-width: 640px)").matches; };
+    var ANIM = 300;        // matches the panel slide transition
 
-    // hoist every referenced card to <body> so positioning is page-relative
+    // give each card's title a stable id so the drawer can be labelled by it
     var cards = {};
     hls.forEach(function (hl) {
       var id = hl.getAttribute("data-pop");
       if (cards[id]) return;
       var card = document.getElementById("pop-" + id);
       if (!card) return;
-      document.body.appendChild(card);   // out of the hidden store
       cards[id] = card;
-      // wire its close button
-      var x = card.querySelector(".pop__close");
-      if (x) x.addEventListener("click", function (e) { e.stopPropagation(); close(); });
-      // clicks inside the card shouldn't bubble to the document-close handler
-      card.addEventListener("click", function (e) { e.stopPropagation(); });
+      var title = card.querySelector(".pop__title");
+      if (title && !title.id) title.id = "pop-" + id + "-title";
     });
-
-    function position(card, hl) {
-      if (isMobile()) { card.removeAttribute("data-side"); return; } // CSS docks it
-      var r = hl.getBoundingClientRect();
-      var cw = card.offsetWidth, ch = card.offsetHeight;
-      var sx = window.pageXOffset, sy = window.pageYOffset;
-      var vw = document.documentElement.clientWidth;
-
-      // horizontal: center on the highlight, clamp to viewport
-      var left = r.left + sx + r.width / 2 - cw / 2;
-      left = Math.max(sx + EDGE, Math.min(left, sx + vw - cw - EDGE));
-
-      // vertical: prefer below; flip above if not enough room
-      var below = r.bottom + GAP + ch <= window.innerHeight - EDGE;
-      var top = below ? (r.bottom + sy + GAP) : (r.top + sy - ch - GAP);
-      card.setAttribute("data-side", below ? "bottom" : "top");
-
-      // arrow x: point at the highlight's center, within the card
-      var arrowX = (r.left + sx + r.width / 2) - left;
-      arrowX = Math.max(16, Math.min(arrowX, cw - 16));
-      card.style.setProperty("--arrow-x", arrowX + "px");
-
-      card.style.left = left + "px";
-      card.style.top = top + "px";
-    }
 
     function open(hl) {
       var id = hl.getAttribute("data-pop");
       var card = cards[id];
       if (!card) return;
-      if (openPop === card) { close(); return; } // toggle off
-      close();
+      if (openCard === card) { close(); return; } // toggle off
+      if (openCard) returnCard();                 // swap content if already open
+
+      panel.appendChild(card);                    // move into the drawer
       card.removeAttribute("hidden");
-      position(card, hl);
-      // next frame -> trigger enter transition
-      requestAnimationFrame(function () { card.classList.add("is-open"); });
+      var title = card.querySelector(".pop__title");
+      if (title) drawer.setAttribute("aria-labelledby", title.id);
+
+      drawer.removeAttribute("hidden");
+      document.body.style.overflow = "hidden";
+      panel.scrollTop = 0;
+      // next frame -> trigger slide-in
+      requestAnimationFrame(function () {
+        drawer.classList.add("is-open");
+        if (panel.focus) panel.focus();
+      });
       hl.setAttribute("aria-expanded", "true");
-      openPop = card; openHl = hl;
+      openCard = card; openHl = hl;
+    }
+
+    // move the open card back to its offscreen store
+    function returnCard() {
+      if (!openCard) return;
+      openCard.setAttribute("hidden", "");
+      if (store) store.appendChild(openCard);
+      if (openHl) openHl.setAttribute("aria-expanded", "false");
     }
 
     function close() {
-      if (!openPop) return;
-      openPop.classList.remove("is-open");
-      var card = openPop, hl = openHl;
-      // hide after the transition so it's removed from a11y tree
+      if (!openCard) return;
+      var hl = openHl;
+      drawer.classList.remove("is-open");
       window.setTimeout(function () {
-        if (!card.classList.contains("is-open")) card.setAttribute("hidden", "");
-      }, 180);
-      if (hl) hl.setAttribute("aria-expanded", "false");
-      openPop = null; openHl = null;
+        if (!drawer.classList.contains("is-open")) {
+          returnCard();
+          drawer.setAttribute("hidden", "");
+          openCard = null; openHl = null;
+        }
+      }, ANIM);
+      document.body.style.overflow = "";
+      if (hl) hl.focus();                         // restore focus to the trigger
     }
 
     hls.forEach(function (hl) {
       hl.addEventListener("click", function (e) { e.stopPropagation(); open(hl); });
     });
 
-    // close on click-away, Esc; reposition on scroll/resize
-    document.addEventListener("click", function () { close(); });
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape" && openPop) {
-        var hl = openHl;        // capture before close() nulls it
-        close();
-        if (hl) hl.focus();
-      }
+    // close on the drawer's close button or backdrop
+    Array.prototype.forEach.call(drawer.querySelectorAll("[data-drawer-close]"), function (el) {
+      el.addEventListener("click", function (e) { e.stopPropagation(); close(); });
     });
-    var reflow = function () {
-      if (!openPop || !openHl) return;
-      if (isMobile()) return;             // docked; nothing to recompute
-      position(openPop, openHl);
-    };
-    window.addEventListener("scroll", reflow, { passive: true });
-    window.addEventListener("resize", function () {
-      if (openPop) close();               // simplest: close on resize
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && openCard) { e.stopPropagation(); close(); }
+    });
+
+    // ---- Tabs inside the drawer card (ARIA tablist) --------------
+    Array.prototype.forEach.call(document.querySelectorAll(".pop__tabs"), function (tablist) {
+      var tabs = Array.prototype.slice.call(tablist.querySelectorAll("[role='tab']"));
+      var select = function (tab, focus) {
+        tabs.forEach(function (t) {
+          var on = t === tab;
+          t.setAttribute("aria-selected", String(on));
+          if (on) { t.removeAttribute("tabindex"); } else { t.setAttribute("tabindex", "-1"); }
+          var panelEl = document.getElementById(t.getAttribute("aria-controls"));
+          if (panelEl) { if (on) { panelEl.removeAttribute("hidden"); } else { panelEl.setAttribute("hidden", ""); } }
+        });
+        if (focus) tab.focus();
+      };
+      tabs.forEach(function (tab, i) {
+        tab.addEventListener("click", function (e) { e.stopPropagation(); select(tab, false); });
+        tab.addEventListener("keydown", function (e) {
+          var idx = null;
+          if (e.key === "ArrowRight" || e.key === "ArrowDown") idx = (i + 1) % tabs.length;
+          else if (e.key === "ArrowLeft" || e.key === "ArrowUp") idx = (i - 1 + tabs.length) % tabs.length;
+          else if (e.key === "Home") idx = 0;
+          else if (e.key === "End") idx = tabs.length - 1;
+          if (idx !== null) { e.preventDefault(); e.stopPropagation(); select(tabs[idx], true); }
+        });
+      });
     });
   })();
 

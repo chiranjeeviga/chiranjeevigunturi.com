@@ -1,5 +1,5 @@
 /* =========================================================================
-   Chiranjeevi Gunturi — portfolio (story-first, editorial)
+   Chiranjeevi Gunturi, portfolio (story-first, editorial)
    Monochrome. Bricolage Grotesque (display) + Hanken Grotesk (body)
    + Spectral italic (emphasis).
    ========================================================================= */
@@ -321,87 +321,110 @@ em { font-style: italic; }
 }
 .hl:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; border-radius: 2px; }
 
-/* the offscreen store never shows; JS moves a clone/positions the node */
+/* the offscreen store never shows; JS moves cards into the drawer panel */
 .pop-store { position: absolute; left: -9999px; }
 
-/* a popover card */
-.pop {
-  position: absolute;
-  z-index: 60;
-  width: min(30rem, calc(100vw - 2 * var(--space-lg)));
-  max-width: 30rem;
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  box-shadow:
-    0 1px 2px oklch(0.205 0.004 260 / 0.06),
-    0 12px 28px -8px oklch(0.205 0.004 260 / 0.22);
-  padding: var(--space-lg) var(--space-lg) calc(var(--space-lg) - 4px);
-  /* enter animation */
-  opacity: 0;
-  transform: translateY(4px) scale(0.99);
-  transition: opacity 0.14s ease, transform 0.14s ease;
+/* ------------------------------------------------------------------ *
+ * Story drawer: a right-side reading surface that the highlights open.
+ * The .pop cards (tabs + PAR) live inside .drawer__panel; the drawer is
+ * anchored to the screen, so depth content never overflows or jumps.
+ * ------------------------------------------------------------------ */
+.drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  /* the drawer itself is just a positioning context; pieces fade/slide */
 }
-.pop.is-open { opacity: 1; transform: translateY(0) scale(1); }
+.drawer[hidden] { display: none; }
+.drawer__backdrop {
+  position: absolute;
+  inset: 0;
+  background: oklch(0.2 0.01 260 / 0.42);
+  opacity: 0;
+  transition: opacity 0.24s var(--ease);
+}
+.drawer__panel {
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: min(34rem, 100vw);
+  background: var(--paper);
+  border-left: 1px solid var(--line);
+  box-shadow: -18px 0 48px -24px oklch(0.205 0.004 260 / 0.35);
+  /* the panel scrolls internally; content can be any height */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: clamp(var(--space-2xl), 4vw, var(--space-3xl))
+           clamp(var(--space-xl), 4vw, var(--space-2xl))
+           var(--space-3xl);
+  transform: translateX(100%);
+  transition: transform 0.28s var(--ease);
+}
+.drawer.is-open .drawer__backdrop { opacity: 1; }
+.drawer.is-open .drawer__panel { transform: translateX(0); }
+
+/* a story card, now a block inside the drawer (no longer floating) */
+.pop {
+  position: static;
+  width: auto;
+  max-width: none;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+}
+.pop[hidden] { display: none; }
 .pop__title {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 0.92rem;
-  letter-spacing: -0.01em;
+  font-size: clamp(1.05rem, 1vw + 0.8rem, 1.3rem);
+  letter-spacing: -0.015em;
   color: var(--ink);
-  margin: 0 var(--space-lg) var(--space-sm) 0; /* room for close btn */
-  line-height: 1.25;
+  margin: 0 var(--space-2xl) var(--space-lg) 0; /* room for close btn */
+  line-height: 1.22;
 }
-.pop__body { font-size: 0.9rem; line-height: 1.62; color: var(--ink-soft); }
-.pop__body p { margin: 0 0 var(--space-sm); }
+.pop__body { font-size: 0.96rem; line-height: 1.68; color: var(--ink-soft); }
+.pop__body p { margin: 0 0 var(--space-md); }
 .pop__body p:last-child { margin-bottom: 0; }
-.pop__close {
+
+/* one close button, fixed to the drawer (not per-card) */
+.drawer__close {
   position: absolute;
-  top: 8px; right: 10px;
-  width: 28px; height: 28px;
+  top: var(--space-md); right: var(--space-md);
+  width: 36px; height: 36px;
   display: grid; place-items: center;
-  font: inherit; font-size: 1.25rem; line-height: 1;
+  font: inherit; font-size: 1.5rem; line-height: 1;
   color: var(--ink-soft);
-  background: transparent; border: 0; border-radius: 50%;
+  background: var(--paper); border: 1px solid var(--line); border-radius: 50%;
   cursor: pointer;
-  transition: background 0.14s ease, color 0.14s ease;
+  z-index: 1;
+  transition: background 0.14s ease, color 0.14s ease, border-color 0.14s ease;
 }
-.pop__close:hover { background: var(--bg-panel); color: var(--ink); }
-.pop__close:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; }
+.drawer__close:hover { background: var(--bg-panel); color: var(--ink); border-color: var(--ink); }
+.drawer__close:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+/* per-card close buttons are redundant inside the drawer */
+.pop .pop__close { display: none; }
 
-/* little arrow pointing back to the highlight */
-.pop::before {
-  content: "";
-  position: absolute;
-  left: var(--arrow-x, 50%);
-  margin-left: -6px;
-  width: 12px; height: 12px;
-  background: var(--paper);
-  border-left: 1px solid var(--line);
-  border-top: 1px solid var(--line);
-  transform: rotate(45deg);
-}
-.pop[data-side="bottom"]::before { top: -7px; }
-.pop[data-side="top"]::before    { bottom: -7px; border-left: 0; border-top: 0; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-
-/* mobile: dock to a centered sheet near the bottom rather than float */
+/* mobile: the drawer becomes a full-width sheet rising from the bottom */
 @media (max-width: 640px) {
-  .pop {
-    position: fixed;
-    left: var(--space-md) !important;
-    right: var(--space-md);
-    top: auto !important;
-    bottom: var(--space-lg);
-    width: auto;
-    max-width: none;
-    transform: translateY(8px);
+  .drawer__panel {
+    top: auto;
+    width: 100%;
+    max-height: 92vh;
+    border-left: 0;
+    border-top-left-radius: var(--radius);
+    border-top-right-radius: var(--radius);
+    box-shadow: 0 -18px 48px -24px oklch(0.205 0.004 260 / 0.4);
+    transform: translateY(100%);
   }
-  .pop.is-open { transform: translateY(0); }
-  .pop::before { display: none; }
+  .drawer.is-open .drawer__panel { transform: translateY(0); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pop { transition: opacity 0.001ms; transform: none !important; }
+  .drawer__backdrop,
+  .drawer__panel { transition: opacity 0.001ms; }
+  .drawer__panel { transform: none !important; }
   .hl { transition: none; }
 }
 
@@ -450,5 +473,85 @@ em { font-style: italic; }
   text-shadow: 0 1px 3px oklch(0 0 0 / 0.5);
 }
 
-/* cert card has no figure now — let the thumbnail sit at the start */
+/* cert card has no figure now, let the thumbnail sit at the start */
 .metric--cred .metric__top { justify-content: flex-start; }
+
+/* ------------------------------------------------------------------ *
+ * Tabbed popovers + PAR (Problem / Action / Result) sections
+ * ------------------------------------------------------------------ */
+.pop__tabs {
+  display: flex;
+  gap: var(--space-sm);
+  margin: 0 0 var(--space-xl);
+  border-bottom: 1px solid var(--line);
+  /* keep tabs in view while reading long PAR content in the drawer */
+  position: sticky;
+  top: calc(-1 * clamp(var(--space-2xl), 4vw, var(--space-3xl)));
+  background: var(--paper);
+  z-index: 1;
+}
+.pop__tab {
+  font: inherit;
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  padding: var(--space-xs) var(--space-2xs) var(--space-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+/* hand-drawn glyph; inherits the tab's text colour so it darkens with it */
+.pop__tab-ico {
+  width: 21px; height: 21px;
+  flex: none;
+  color: var(--muted);
+  overflow: visible;
+  transition: color 0.15s ease, transform 0.18s var(--ease);
+}
+.pop__tab-ico .tab-ico-txt {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 7px;
+  fill: currentColor;
+}
+.pop__tab:hover { color: var(--ink); }
+.pop__tab:hover .pop__tab-ico { color: var(--ink); }
+.pop__tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--ink); }
+.pop__tab[aria-selected="true"] .pop__tab-ico { color: var(--ink); transform: rotate(-3deg) scale(1.06); }
+.pop__tab:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; border-radius: 2px; }
+
+.pop__panel[hidden] { display: none; }
+
+/* PAR section: Problem / Action / Result, room to read in the drawer */
+.par + .par { margin-top: var(--space-xl); }
+.par__label {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 var(--space-xs);
+}
+.par p:not(.par__label) { margin: 0 0 var(--space-xs); font-size: 0.96rem; line-height: 1.68; color: var(--ink-soft); }
+.par p:not(.par__label):last-child { margin-bottom: 0; }
+/* the design question that closes a "problem" block: set apart, in the reader's face */
+.par__q {
+  margin-top: var(--space-sm) !important;
+  padding-left: var(--space-md);
+  border-left: 2px solid var(--ink);
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-size: 1.08rem !important;
+  line-height: 1.5 !important;
+  color: var(--ink) !important;
+  text-wrap: pretty;
+}
