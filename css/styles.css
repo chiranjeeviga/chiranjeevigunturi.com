@@ -127,8 +127,8 @@ em { font-style: italic; }
 .lightbox { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; padding: clamp(var(--space-lg), 5vw, var(--space-3xl)); }
 .lightbox[hidden] { display: none; }
 .lightbox__backdrop { position: absolute; inset: 0; background: oklch(0.2 0.01 260 / 0.62); }
-.lightbox__inner { position: relative; margin: 0; max-width: 560px; width: 100%; }
-.lightbox__img { width: 100%; height: auto; display: block; border-radius: 4px; box-shadow: 0 24px 70px oklch(0 0 0 / 0.45); }
+.lightbox__inner { position: relative; margin: 0; max-width: 560px; width: 100%; max-height: 100%; display: flex; flex-direction: column; align-items: center; }
+.lightbox__img { max-width: 100%; width: auto; max-height: calc(100vh - 8rem); height: auto; display: block; border-radius: 4px; box-shadow: 0 24px 70px oklch(0 0 0 / 0.45); object-fit: contain; }
 .lightbox__close { position: absolute; top: -14px; right: -14px; width: 36px; height: 36px; border-radius: 50%; border: none; background: var(--ink); color: var(--bg); font-size: 1.4rem; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .story-beat__icon path { stroke-linecap: round; stroke-linejoin: round; }
 .story-toggle { margin-top: var(--space-2xl); font-family: inherit; font-size: 0.95rem; font-weight: 600; letter-spacing: -0.01em; color: var(--ink); background: none; border: none; border-bottom: 1.5px solid var(--ink); padding: 0 0 3px; cursor: pointer; }
@@ -404,3 +404,51 @@ em { font-style: italic; }
   .pop { transition: opacity 0.001ms; transform: none !important; }
   .hl { transition: none; }
 }
+
+/* ------------------------------------------------------------------ *
+ * Zoomable images: story photos + cert thumbnail -> shared lightbox
+ * ------------------------------------------------------------------ */
+.is-zoomable { cursor: zoom-in; transition: filter 0.18s ease, transform 0.18s ease; }
+.is-zoomable:hover { filter: brightness(0.97); }
+.is-zoomable:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+/* cert thumbnail trigger (replaces the old sketch badge) */
+.cred-trigger--thumb {
+  position: relative;
+  width: 60px; height: 44px;
+  flex: 0 0 auto;
+  margin-top: 2px;
+  border-radius: 5px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  box-shadow: 0 1px 2px oklch(0.205 0.004 260 / 0.08);
+  cursor: zoom-in;
+  line-height: 0;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+.cred-trigger--thumb:hover { border-color: var(--ink-soft); box-shadow: 0 3px 10px oklch(0.205 0.004 260 / 0.16); transform: translateY(-1px); }
+.cred-trigger--thumb:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+.cred-thumb { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
+.cred-thumb__zoom {
+  position: absolute;
+  right: 3px; bottom: 2px;
+  font-size: 0.7rem;
+  line-height: 1;
+  color: var(--paper);
+  text-shadow: 0 1px 2px oklch(0 0 0 / 0.7);
+  pointer-events: none;
+}
+
+/* lightbox caption */
+.lightbox__cap {
+  margin-top: var(--space-sm);
+  text-align: center;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: oklch(0.92 0.004 260);
+  text-shadow: 0 1px 3px oklch(0 0 0 / 0.5);
+}
+
+/* cert card has no figure now — let the thumbnail sit at the start */
+.metric--cred .metric__top { justify-content: flex-start; }

@@ -80,11 +80,11 @@
           <p class="reveal">My first resume took me a week when friends filled a template in an afternoon, because I wanted to own every word and stand behind each line. When they later asked me to review theirs, I didn't rewrite them, I asked questions, and their own answers made them better, the instinct I still work from.</p>
           <div class="story-beat reveal">
             <div class="story-beat__text"><p>At <button type="button" class="hl" data-pop="gojek" aria-expanded="false">Gojek</button>, I joined as lead PM to build a social app for Mapan, the unit serving women resellers across smaller-city Indonesia who earn a living selling to their neighbours, and that mission is why I came. Through a reorg I became head of product and design, hired a new team, and reshaped how product, design, research, and engineering worked together. We tripled revenue in eighteen months and built the full social app, feed, connections, and ranking.</p></div>
-            <img class="story-beat__photo" id="photo-gojek" src="img/photo-gojek.jpeg" alt="In the field with Mapan resellers during a home visit, Indonesia" loading="lazy">
+            <img data-zoom class="story-beat__photo is-zoomable" id="photo-gojek" src="img/photo-gojek.jpeg" alt="In the field with Mapan resellers during a home visit, Indonesia" loading="lazy">
           </div>
           <div class="story-beat story-beat--rev reveal">
             <div class="story-beat__text"><p>At <strong>DBS</strong> in Singapore I found my footing in product. Back in 2014, when few wallets existed, I saw what <button type="button" class="hl" data-pop="paylah" aria-expanded="false">PayLah!</button> could be when others doubted it, and built its referral engine into production myself, every edge case, money flow, and unclaimed reward. That engine helped PayLah reach half a million users, and I grew the team to twelve and built out its merchant-payments side.</p></div>
-            <img class="story-beat__photo" id="photo-paylah" src="img/photo-paylah.jpeg" alt="Holding the Straits Times full-page ad, Singapore's first wearable bank, DBS PayLah" loading="lazy">
+            <img data-zoom class="story-beat__photo is-zoomable" id="photo-paylah" src="img/photo-paylah.jpeg" alt="Holding the Straits Times full-page ad, Singapore's first wearable bank, DBS PayLah" loading="lazy">
           </div>
           <p class="reveal">By 2016 I was building with NLP, the heart of today's AI, before most banks were. As the SME on one of the region’s first <button type="button" class="hl" data-pop="chatbot" aria-expanded="false">conversational-banking chatbots</button>, I worked with Kasisto's engine to get it understanding how real people phrase things, the same request arriving as &ldquo;transaction&rdquo; or &ldquo;TXN&rdquo;. We took it to production inside a bank, clearing the security, compliance, and risk bar when none of it was charted.</p>
           <blockquote class="pullquote reveal">I work backwards from the outcome, through every perspective that gets us there.</blockquote>
@@ -163,11 +163,11 @@
           </div>
           <span class="metric__label">building AI in production since the DBS chatbot, before ChatGPT</span>
         </li>
-        <li class="metric reveal">
+        <li class="metric metric--cred reveal">
           <div class="metric__top">
-            <span class="metric__fig">301</span>
-            <button class="cred-trigger" type="button" aria-label="View the Claude Certified Architect certificate" data-cred-open>
-              <svg class="metric__icon" id="cred-badge" viewBox="0 0 64 64" aria-hidden="true"></svg>
+            <button class="cred-trigger cred-trigger--thumb" type="button" aria-label="View the Claude Certified Architect certificate" data-cred-open data-zoom>
+              <img class="cred-thumb" src="img/cert-claude.jpeg" alt="Claude Certified Architect certificate, Anthropic, valid May to November 2026" loading="lazy">
+              <span class="cred-thumb__zoom" aria-hidden="true">&#x2922;</span>
             </button>
           </div>
           <span class="metric__label"><strong>Claude Certified Architect</strong> and <strong>Advanced MCP</strong> certified, the stack I ship on.</span>
@@ -323,11 +323,12 @@
     <p class="site-footer__meta">Product &amp; AI Strategy &middot; Hyderabad, India &middot; <a href="https://chiranjeevigunturi.com">chiranjeevigunturi.com</a></p>
   </footer>
 
-  <div class="lightbox" id="cert-lightbox" hidden>
+  <div class="lightbox" id="cert-lightbox" role="dialog" aria-modal="true" aria-label="Image viewer" hidden>
     <div class="lightbox__backdrop" data-cred-close></div>
     <figure class="lightbox__inner">
-      <img class="lightbox__img" src="img/cert-claude.jpeg" alt="Claude Certified Architect certificate, Anthropic, valid May to November 2026">
-      <button class="lightbox__close" type="button" aria-label="Close certificate" data-cred-close>&times;</button>
+      <img class="lightbox__img" id="lightbox-img" src="img/cert-claude.jpeg" alt="Claude Certified Architect certificate, Anthropic, valid May to November 2026">
+      <figcaption class="lightbox__cap" id="lightbox-cap"></figcaption>
+      <button class="lightbox__close" type="button" aria-label="Close" data-cred-close>&times;</button>
     </figure>
   </div>
 

@@ -71,12 +71,6 @@
       add(rc.circle(32, 28, 2.6, SoftSolid(91)));
       add(rc.circle(40, 28, 2.6, SoftSolid(92)));
     });
-    drawInto("cred-badge", function (rc, add) {
-      add(rc.circle(32, 31, 40, Ssoft(0.8, 1.5, 60)));
-      add(rc.circle(32, 31, 30, Ssoft(0.8, 1.3, 64)));
-      add(rc.line(24, 32, 29, 37, Ssoft(0.8, 1.8, 66)));
-      add(rc.line(29, 37, 41, 23, Ssoft(0.8, 1.8, 67)));
-    });
     var beats = document.querySelectorAll(".prose .beat");
     var SVGNS = "http://www.w3.org/2000/svg";
     Array.prototype.forEach.call(beats, function (beat, i) {

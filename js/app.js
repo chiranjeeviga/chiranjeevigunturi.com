@@ -52,14 +52,42 @@
     });
   }
 
-  var credLb = document.getElementById("cert-lightbox");
-  var credOpen = document.querySelector("[data-cred-open]");
-  if (credLb && credOpen) {
-    var showCred = function () { credLb.removeAttribute("hidden"); document.body.style.overflow = "hidden"; };
-    var hideCred = function () { credLb.setAttribute("hidden", ""); document.body.style.overflow = ""; };
-    credOpen.addEventListener("click", showCred);
-    Array.prototype.forEach.call(credLb.querySelectorAll("[data-cred-close]"), function (el) { el.addEventListener("click", hideCred); });
-    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !credLb.hasAttribute("hidden")) hideCred(); });
+  /* ---- Image lightbox (shared) ---------------------------------- *
+   * The cert thumbnail and any [data-zoom] image open one lightbox.
+   * The clicked image's src + alt are swapped in (alt becomes caption).
+   * --------------------------------------------------------------- */
+  var lb = document.getElementById("cert-lightbox");
+  if (lb) {
+    var lbImg = document.getElementById("lightbox-img");
+    var lbCap = document.getElementById("lightbox-cap");
+    var lastFocus = null;
+    var showLb = function (src, alt) {
+      if (src && lbImg) { lbImg.setAttribute("src", src); lbImg.setAttribute("alt", alt || ""); }
+      if (lbCap) { lbCap.textContent = alt || ""; lbCap.style.display = alt ? "" : "none"; }
+      lb.removeAttribute("hidden");
+      document.body.style.overflow = "hidden";
+    };
+    var hideLb = function () {
+      lb.setAttribute("hidden", "");
+      document.body.style.overflow = "";
+      if (lastFocus && lastFocus.focus) { lastFocus.focus(); lastFocus = null; }
+    };
+    // every zoomable element opens the lightbox with its own image
+    Array.prototype.forEach.call(document.querySelectorAll("[data-zoom]"), function (el) {
+      el.addEventListener("click", function (e) {
+        e.preventDefault();
+        lastFocus = el;
+        var img = el.tagName === "IMG" ? el : el.querySelector("img");
+        if (img) showLb(img.getAttribute("src"), img.getAttribute("alt"));
+        else showLb(); // fallback: show whatever is already in the lightbox
+      });
+    });
+    Array.prototype.forEach.call(lb.querySelectorAll("[data-cred-close]"), function (el) {
+      el.addEventListener("click", hideLb);
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && !lb.hasAttribute("hidden")) hideLb();
+    });
   }
 
   /* ---- Story highlight popovers ---------------------------------- *
