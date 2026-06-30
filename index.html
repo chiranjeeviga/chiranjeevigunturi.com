@@ -19,6 +19,126 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=Spectral:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <style>
+/* ---- Cover banner ---- */
+.hero__cover { margin: 0 0 var(--space-2xl); }
+.cover-band__frame { width: 100%; aspect-ratio: 3 / 1; overflow: hidden; border-radius: 2px; }
+.cover-band__frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cover-band figcaption { margin-top: var(--space-sm); font-size: 0.9rem; color: var(--ink-soft); }
+@media (max-width: 760px) { .cover-band__frame { aspect-ratio: 2 / 1; } }
+
+/* ---- Footnote pop-up highlights ---- */
+.fn {
+  position: relative;
+  display: inline;
+  cursor: pointer;
+  background: linear-gradient(to bottom, transparent 60%, oklch(0.88 0.006 260) 60%);
+  border-radius: 1px;
+  padding: 0 1px;
+  transition: background 0.2s;
+}
+.fn:hover, .fn.fn--open {
+  background: linear-gradient(to bottom, transparent 55%, oklch(0.78 0.008 260) 55%);
+}
+.fn::after {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: var(--ink);
+  border-radius: 50%;
+  vertical-align: super;
+  font-size: 0.6em;
+  margin-left: 2px;
+  opacity: 0.5;
+}
+.fn-popup {
+  display: none;
+  position: absolute;
+  z-index: 100;
+  left: 0;
+  top: calc(100% + 6px);
+  width: 340px;
+  max-width: 90vw;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--space-lg) var(--space-xl);
+  box-shadow: 0 8px 32px oklch(0.2 0.01 260 / 0.12);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--prose);
+}
+.fn-popup.fn-popup--right { left: auto; right: 0; }
+.fn-popup[aria-hidden="false"] { display: block; }
+.fn-popup__role {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: var(--space-xs);
+}
+.fn-popup__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  margin-bottom: var(--space-sm);
+}
+.fn-popup__close {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--ink-soft);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.fn-popup__close:hover { border-color: var(--ink); color: var(--ink); }
+@media (max-width: 640px) {
+  .fn-popup { position: fixed; left: var(--space-md); right: var(--space-md); width: auto; top: auto; bottom: var(--space-xl); }
+}
+
+/* ---- Story short/full toggle ---- */
+.story-full[hidden], .story-short[hidden] { display: none; }
+.story-toggle {
+  margin-top: var(--space-2xl);
+  font-family: inherit; font-size: 0.95rem; font-weight: 600; letter-spacing: -0.01em;
+  color: var(--ink); background: none; border: none;
+  border-bottom: 1.5px solid var(--ink); padding: 0 0 3px; cursor: pointer;
+}
+.story-toggle:hover { opacity: 0.6; }
+
+/* ---- Metrics ---- */
+.metrics { list-style: none; padding: 0; margin: var(--space-2xl) 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-md); }
+.metric { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: clamp(var(--space-lg), 3vw, var(--space-2xl)); display: flex; flex-direction: column; gap: var(--space-sm); }
+.metric__fig { font-family: var(--font-display); font-weight: 800; font-size: clamp(2rem, 3vw + 1rem, 3rem); letter-spacing: -0.03em; line-height: 1; color: var(--ink); }
+.metric__label { color: var(--ink-soft); font-size: 0.98rem; line-height: 1.45; }
+.metric__label strong { color: var(--ink); font-weight: 600; }
+@media (max-width: 640px) { .metrics { grid-template-columns: 1fr; } }
+
+/* ---- Depth grid ---- */
+.depth { border-top: 1px solid var(--line); }
+.depth-grid { list-style: none; padding: 0; margin: var(--space-2xl) 0 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-xl) var(--space-2xl); }
+.depth-card { border-top: 2px solid var(--ink); padding-top: var(--space-md); }
+.depth-card__title { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.1rem, 1vw + 0.85rem, 1.4rem); letter-spacing: -0.02em; margin-bottom: var(--space-sm); }
+.depth-card__items { color: var(--ink-soft); font-size: 0.97rem; line-height: 1.65; }
+@media (max-width: 760px) { .depth-grid { grid-template-columns: 1fr; gap: var(--space-lg); } }
+
+/* ---- help note ---- */
+.help__note { margin-top: var(--space-2xl); color: var(--ink-soft); font-size: 0.98rem; font-style: italic; }
+</style>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -34,7 +154,7 @@
       </button>
       <div class="nav__links" id="nav-links">
         <a href="#story">The story</a>
-        <a href="#believe">What I believe</a>
+        <a href="#results">Results</a>
         <a href="#building">What I'm building</a>
         <a class="nav__cta" href="#contact">Work with me</a>
       </div>
@@ -45,6 +165,11 @@
 
     <!-- HOOK -->
     <section class="hero">
+      <figure class="hero__cover reveal">
+        <div class="cover-band__frame">
+          <img src="cover-tpf.jpeg" alt="Chiranjeevi Gunturi speaking at a product event" />
+        </div>
+      </figure>
       <p class="eyebrow reveal">Product &amp; AI Strategy</p>
       <h1 class="hero__title reveal">
         For fifteen years, my job was to decide <em>what to build.</em>
@@ -66,21 +191,105 @@
       <h2 class="section-title reveal" id="story-title">The hard part was never the building.</h2>
 
       <div class="prose">
-        <p class="reveal">I started as an engineer who kept asking one question: why are we building this? It didn't always make me popular. But it turned out to be the only question that mattered.</p>
 
-        <p class="reveal">At DBS in Singapore, that question became <strong>PayLah!</strong>, a payments app that grew to half a million downloads. At <strong>Ant Financial</strong>, working on Paytm, it meant cutting churn by a third by fixing what actually made people leave. At <strong>Gojek</strong>, I led product and design for Mapan, the financial-inclusion arm of a $10 billion super-app. In eighteen months we tripled revenue. Not by building more, but by being honest about what was worth building.</p>
+        <div id="story-short">
+          <p class="reveal">I started as an engineer who kept asking one question: why are we building this? It didn't always make me popular. But it turned out to be the only question that mattered.</p>
 
-        <blockquote class="pullquote reveal">Knowing what deserves to exist is harder than building it. That gap is where I've spent my career.</blockquote>
+          <p class="reveal">At DBS in Singapore, that question became
+            <span class="fn" id="fn-paylah" tabindex="0" role="button" aria-expanded="false" aria-describedby="popup-paylah"><strong>PayLah!</strong></span>,
+            a payments app that grew to half a million downloads. At
+            <span class="fn" id="fn-ant" tabindex="0" role="button" aria-expanded="false" aria-describedby="popup-ant"><strong>Ant Financial</strong></span>,
+            working on Paytm, it meant cutting churn by a third by fixing what actually made people leave. At
+            <span class="fn" id="fn-gojek" tabindex="0" role="button" aria-expanded="false" aria-describedby="popup-gojek"><strong>Gojek</strong></span>,
+            I led product and design for Mapan, the financial-inclusion arm of a $10 billion super-app. In eighteen months we tripled revenue. Not by building more, but by being honest about what was worth building.
+          </p>
 
-        <p class="reveal">In 2020, I tried to put that belief into a product. I called it <strong>MeNext</strong>. An AI that would interview you so you could write your own resume, in your own words, and own every word of it. Not a service that writes it for you. A tool that helps you think.</p>
+          <blockquote class="pullquote reveal">Knowing what deserves to exist is harder than building it. That gap is where I've spent my career.</blockquote>
 
-        <p class="reveal">I never built it.</p>
+          <p class="reveal">In 2020, I tried to put that belief into a product. I called it <strong>MeNext</strong>. An AI that would interview you so you could write your own resume, in your own words, and own every word of it. Not a service that writes it for you. A tool that helps you think.</p>
 
-        <p class="reveal">But I couldn't let go of the idea underneath it. <em>AI should help you think and own your work, not do the thinking for you.</em></p>
+          <p class="reveal">I never built it.</p>
 
-        <p class="reveal">Then things changed. AI made building almost free. Anyone can ship now. And when everyone can build, the hard part becomes knowing <em>what's worth building</em>. The bottleneck moved, from making things to making the right call.</p>
+          <p class="reveal">But I couldn't let go of the idea underneath it. <em>AI should help you think and own your work, not do the thinking for you.</em></p>
 
-        <p class="reveal">So I stopped waiting and started building again. The same idea I sketched in 2020, finally made real.</p>
+          <p class="reveal">Then things changed. AI made building almost free. Anyone can ship now. And when everyone can build, the hard part becomes knowing <em>what's worth building</em>. The bottleneck moved, from making things to making the right call.</p>
+
+          <p class="reveal">So I stopped waiting and started building again. The same idea I sketched in 2020, finally made real.</p>
+        </div>
+
+        <div id="story-full" hidden>
+          <p class="reveal">I started as an engineer who kept asking one question: why are we building this? It didn't always make me popular. But it turned out to be the only question that mattered.</p>
+
+          <p class="reveal">At DBS in Singapore, I joined a small payments team and that question became
+            <span class="fn fn--open-allowed" id="fn-paylah-full" tabindex="0" role="button" aria-expanded="false" aria-describedby="popup-paylah-full"><strong>PayLah!</strong></span>.
+            We weren't just building a wallet. We were building the habit of paying differently. That distinction changed every decision: how we did onboarding, what the referral mechanic looked like, why we built a merchant API at all. The app grew to half a million downloads. I went from two to twelve on the team in six months. And in 2016, I shipped one of the first AI chatbots in banking, before anyone was calling it AI.</p>
+
+          <p class="reveal">Then Ant Financial came calling. I joined to work on Paytm in India. The user base was enormous. The churn was too.
+            <span class="fn" id="fn-ant-full" tabindex="0" role="button" aria-expanded="false" aria-describedby="popup-ant-full">We cut churn by a third.</span>
+            Not by launching features. By doing the analysis to understand exactly what made people leave, and then removing those reasons one by one.</p>
+
+          <p class="reveal">Gojek was different. I joined to build a social app for
+            <span class="fn" id="fn-gojek-full" tabindex="0" role="button" aria-expanded="false" aria-describedby="popup-gojek-full"><strong>Mapan</strong></span>,
+            the unit serving women resellers across smaller-city Indonesia who earn a living selling to their neighbours. The mission was why I came. Through a reorg I became head of product and design, hired a new team, and reshaped how product, design, research, and engineering worked together. In eighteen months we tripled revenue and shipped the full social product.</p>
+
+          <blockquote class="pullquote reveal">Knowing what deserves to exist is harder than building it. That gap is where I've spent my career.</blockquote>
+
+          <p class="reveal">In 2020, I tried to put that belief into a product. I called it <strong>MeNext</strong>. An AI that would interview you so you could write your own resume, in your own words, and own every word of it. Not a service that writes it for you. A tool that helps you think.</p>
+
+          <p class="reveal">I never built it.</p>
+
+          <p class="reveal">But I couldn't let go of the idea underneath it. <em>AI should help you think and own your work, not do the thinking for you.</em></p>
+
+          <p class="reveal">Then things changed. AI made building almost free. Anyone can ship now. And when everyone can build, the hard part becomes knowing <em>what's worth building</em>. The bottleneck moved, from making things to making the right call.</p>
+
+          <p class="reveal">So I stopped waiting and started building again. The same idea I sketched in 2020, finally made real.</p>
+        </div>
+
+        <button class="story-toggle" id="story-toggle" type="button" aria-expanded="false">Read more</button>
+      </div>
+
+      <!-- Pop-up cards -->
+      <div class="fn-popup" id="popup-paylah" role="tooltip" aria-hidden="true">
+        <button class="fn-popup__close" aria-label="Close" data-fn-close>&times;</button>
+        <p class="fn-popup__role">DBS Singapore &middot; 2014&ndash;2017</p>
+        <p class="fn-popup__title">PayLah! &mdash; Singapore's first viral payments app</p>
+        <p>I joined a two-person PM team and built the referral mechanic that drove PayLah! to 500K downloads. My specific work: the onboarding flow, the peer-to-peer payment UX, the merchant API that let 3rd-party apps accept PayLah! payments, and a conversational AI chatbot for transaction queries — one of the first deployed in banking. I went from a team of 2 to leading a team of 12 within six months.</p>
+      </div>
+
+      <div class="fn-popup fn-popup--right" id="popup-ant" role="tooltip" aria-hidden="true">
+        <button class="fn-popup__close" aria-label="Close" data-fn-close>&times;</button>
+        <p class="fn-popup__role">Ant Financial (Paytm) &middot; 2018&ndash;2019</p>
+        <p class="fn-popup__title">Cutting churn by a third through behaviour analysis</p>
+        <p>Paytm had scale but a churn problem. My job was to find out why users were leaving. I did a deep segmentation and behaviour cluster analysis — not surveys, actual usage patterns. We identified the specific failure moments that drove drop-off, then rebuilt those flows. Result: churn down by a third, monthly engagement up 15%. The lesson: most product problems are diagnostic problems in disguise.</p>
+      </div>
+
+      <div class="fn-popup" id="popup-gojek" role="tooltip" aria-hidden="true">
+        <button class="fn-popup__close" aria-label="Close" data-fn-close>&times;</button>
+        <p class="fn-popup__role">Gojek / Mapan &middot; 2019&ndash;2023</p>
+        <p class="fn-popup__title">Building a social app for 130-person financial-inclusion arm</p>
+        <p>Mapan served women resellers across smaller-city Indonesia — people earning a living selling to their neighbours. I joined as lead PM to build the social product. Through a reorg I became Head of Product and Design: 5 PMs, 5 designers, embedded in a 130-person arm of a $10B super-app. I restructured how product, design, research, and engineering worked together. In 18 months we tripled revenue and shipped the full social app: feed, connections, leaderboard, and ranking system.</p>
+      </div>
+
+      <!-- Full-story duplicates (offset slightly) -->
+      <div class="fn-popup" id="popup-paylah-full" role="tooltip" aria-hidden="true">
+        <button class="fn-popup__close" aria-label="Close" data-fn-close>&times;</button>
+        <p class="fn-popup__role">DBS Singapore &middot; 2014&ndash;2017</p>
+        <p class="fn-popup__title">PayLah! &mdash; Singapore's first viral payments app</p>
+        <p>I joined a two-person PM team and built the referral mechanic that drove PayLah! to 500K downloads. My specific work: the onboarding flow, the peer-to-peer payment UX, the merchant API that let 3rd-party apps accept PayLah! payments, and a conversational AI chatbot for transaction queries — one of the first deployed in banking. I went from a team of 2 to leading a team of 12 within six months.</p>
+      </div>
+
+      <div class="fn-popup fn-popup--right" id="popup-ant-full" role="tooltip" aria-hidden="true">
+        <button class="fn-popup__close" aria-label="Close" data-fn-close>&times;</button>
+        <p class="fn-popup__role">Ant Financial (Paytm) &middot; 2018&ndash;2019</p>
+        <p class="fn-popup__title">Cutting churn by a third through behaviour analysis</p>
+        <p>Paytm had scale but a churn problem. My job was to find out why users were leaving. I did a deep segmentation and behaviour cluster analysis — not surveys, actual usage patterns. We identified the specific failure moments that drove drop-off, then rebuilt those flows. Result: churn down by a third, monthly engagement up 15%. The lesson: most product problems are diagnostic problems in disguise.</p>
+      </div>
+
+      <div class="fn-popup" id="popup-gojek-full" role="tooltip" aria-hidden="true">
+        <button class="fn-popup__close" aria-label="Close" data-fn-close>&times;</button>
+        <p class="fn-popup__role">Gojek / Mapan &middot; 2019&ndash;2023</p>
+        <p class="fn-popup__title">Building a social app for 130-person financial-inclusion arm</p>
+        <p>Mapan served women resellers across smaller-city Indonesia — people earning a living selling to their neighbours. I joined as lead PM to build the social product. Through a reorg I became Head of Product and Design: 5 PMs, 5 designers, embedded in a 130-person arm of a $10B super-app. I restructured how product, design, research, and engineering worked together. In 18 months we tripled revenue and shipped the full social app: feed, connections, leaderboard, and ranking system.</p>
       </div>
 
       <!-- the throughline -->
@@ -102,6 +311,62 @@
         </li>
       </ol>
       <p class="arc__caption reveal">Same idea, five years apart. <em>AI should help you think, not think for you.</em></p>
+    </section>
+
+    <!-- SELECTED RESULTS -->
+    <section class="results" id="results" aria-labelledby="results-title">
+      <p class="eyebrow reveal">Selected results</p>
+      <h2 class="section-title reveal" id="results-title">A few markers behind the work.</h2>
+      <ul class="metrics" role="list">
+        <li class="metric reveal">
+          <span class="metric__fig">3&times;</span>
+          <span class="metric__label">revenue in 18 months, leading product and design at <strong>Mapan (Gojek)</strong></span>
+        </li>
+        <li class="metric reveal">
+          <span class="metric__fig">500k</span>
+          <span class="metric__label">users on <strong>DBS PayLah!</strong>, driven by the viral referral engine I built</span>
+        </li>
+        <li class="metric reveal">
+          <span class="metric__fig">&minus;1/3</span>
+          <span class="metric__label">user churn at <strong>Ant Financial (Paytm)</strong>, by understanding exactly why people were leaving</span>
+        </li>
+        <li class="metric reveal">
+          <span class="metric__fig">2&rarr;12</span>
+          <span class="metric__label">team I scaled at PayLah!, stepping up to lead in six months</span>
+        </li>
+        <li class="metric reveal">
+          <span class="metric__fig">2016</span>
+          <span class="metric__label">shipping AI in production at DBS, <strong>before ChatGPT</strong></span>
+        </li>
+        <li class="metric reveal">
+          <span class="metric__fig">3+5</span>
+          <span class="metric__label">AI products live or in beta today, <strong>built by me</strong></span>
+        </li>
+      </ul>
+    </section>
+
+    <!-- WHERE I'M DEEP -->
+    <section class="depth" id="depth" aria-labelledby="depth-title">
+      <p class="eyebrow reveal">Where I'm strongest</p>
+      <h2 class="section-title reveal" id="depth-title">Four areas I know best.</h2>
+      <ul class="depth-grid" role="list">
+        <li class="depth-card reveal">
+          <h3 class="depth-card__title">Product leadership &amp; 0&rarr;1</h3>
+          <p class="depth-card__items">Building products and orgs from zero &middot; product strategy and the what-to-build call &middot; standing up teams, cadences, and how product, design, research, and engineering work together</p>
+        </li>
+        <li class="depth-card reveal">
+          <h3 class="depth-card__title">AI &amp; agent architecture</h3>
+          <p class="depth-card__items">Production-grade AI systems, not just demos &middot; MCP, RAG, context and evaluation &middot; building with NLP since 2016 &middot; Claude Certified Architect</p>
+        </li>
+        <li class="depth-card reveal">
+          <h3 class="depth-card__title">User behaviour, growth &amp; network effects</h3>
+          <p class="depth-card__items">Jobs-to-be-done and deep user-behaviour analysis &middot; segmentation and cluster analysis &middot; retention and churn &middot; growth experiments that separate causation from correlation &middot; network effects in social products</p>
+        </li>
+        <li class="depth-card reveal">
+          <h3 class="depth-card__title">Fintech, payments &amp; embedded finance</h3>
+          <p class="depth-card__items">Wallets and payments &middot; embedded finance and partner APIs &middot; authorisation, privacy, and bank-grade compliance across markets</p>
+        </li>
+      </ul>
     </section>
 
     <!-- WHAT I BELIEVE -->
@@ -202,5 +467,100 @@
   </footer>
 
   <script src="app.js"></script>
+  <script>
+(function () {
+  "use strict";
+
+  /* ---- Story short/full toggle ---- */
+  var storyToggle = document.getElementById("story-toggle");
+  var storyShort = document.getElementById("story-short");
+  var storyFull = document.getElementById("story-full");
+  if (storyToggle && storyShort && storyFull) {
+    storyToggle.addEventListener("click", function () {
+      var showFull = storyFull.hasAttribute("hidden");
+      if (showFull) {
+        storyFull.removeAttribute("hidden");
+        Array.prototype.forEach.call(storyFull.querySelectorAll(".reveal"), function (el) {
+          el.classList.add("is-visible");
+        });
+        storyShort.setAttribute("hidden", "");
+        storyToggle.textContent = "Show shorter version";
+        storyToggle.setAttribute("aria-expanded", "true");
+      } else {
+        storyFull.setAttribute("hidden", "");
+        storyShort.removeAttribute("hidden");
+        storyToggle.textContent = "Read more";
+        storyToggle.setAttribute("aria-expanded", "false");
+      }
+    });
+  }
+
+  /* ---- Footnote pop-ups ---- */
+  var openPopup = null;
+
+  function closePopup(popup, trigger) {
+    if (!popup) return;
+    popup.setAttribute("aria-hidden", "true");
+    popup.style.display = "none";
+    if (trigger) {
+      trigger.setAttribute("aria-expanded", "false");
+      trigger.classList.remove("fn--open");
+    }
+    openPopup = null;
+  }
+
+  function showPopup(trigger, popup) {
+    if (openPopup && openPopup.popup !== popup) {
+      closePopup(openPopup.popup, openPopup.trigger);
+    }
+    popup.removeAttribute("aria-hidden");
+    popup.style.display = "block";
+    trigger.setAttribute("aria-expanded", "true");
+    trigger.classList.add("fn--open");
+    openPopup = { popup: popup, trigger: trigger };
+  }
+
+  var triggers = Array.prototype.slice.call(document.querySelectorAll(".fn[id]"));
+  triggers.forEach(function (trigger) {
+    var popupId = trigger.getAttribute("aria-describedby");
+    if (!popupId) return;
+    var popup = document.getElementById(popupId);
+    if (!popup) return;
+
+    trigger.addEventListener("click", function (e) {
+      e.stopPropagation();
+      if (openPopup && openPopup.popup === popup) {
+        closePopup(popup, trigger);
+      } else {
+        showPopup(trigger, popup);
+      }
+    });
+
+    trigger.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        trigger.click();
+      }
+      if (e.key === "Escape") closePopup(popup, trigger);
+    });
+  });
+
+  var closeButtons = Array.prototype.slice.call(document.querySelectorAll("[data-fn-close]"));
+  closeButtons.forEach(function (btn) {
+    btn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      if (openPopup) closePopup(openPopup.popup, openPopup.trigger);
+    });
+  });
+
+  document.addEventListener("click", function () {
+    if (openPopup) closePopup(openPopup.popup, openPopup.trigger);
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && openPopup) closePopup(openPopup.popup, openPopup.trigger);
+  });
+})();
+  </script>
 </body>
 </html>
