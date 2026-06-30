@@ -1,26 +1,19 @@
-/* Chiranjeevi Gunturi — portfolio interactions (progressive enhancement) */
 (function () {
   "use strict";
-
-  // Mark JS as available so reveal animations only hide content when they can restore it
   var docEl = document.documentElement;
   docEl.classList.remove("no-js");
   docEl.classList.add("js");
 
-  // Current year in footer
   var yearEl = document.getElementById("year");
   if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 
-  // Sticky header hairline on scroll
   var header = document.querySelector(".site-header");
   var onScroll = function () {
-    if (!header) return;
-    header.classList.toggle("is-scrolled", window.scrollY > 8);
+    if (header) header.classList.toggle("is-scrolled", window.scrollY > 8);
   };
   onScroll();
   window.addEventListener("scroll", onScroll, { passive: true });
 
-  // Mobile nav toggle
   var toggle = document.querySelector(".nav__toggle");
   var links = document.getElementById("nav-links");
   if (toggle && links) {
@@ -38,7 +31,37 @@
     });
   }
 
-  // Staggered reveal-on-scroll
+  var storyToggle = document.getElementById("story-toggle");
+  var storyShort = document.getElementById("story-short");
+  var storyFull = document.getElementById("story-full");
+  if (storyToggle && storyShort && storyFull) {
+    storyToggle.addEventListener("click", function () {
+      var showFull = storyFull.hasAttribute("hidden");
+      if (showFull) {
+        storyFull.removeAttribute("hidden");
+        Array.prototype.forEach.call(storyFull.querySelectorAll(".reveal"), function (el) { el.classList.add("is-visible"); });
+        storyShort.setAttribute("hidden", "");
+        storyToggle.textContent = "Show short version";
+        storyToggle.setAttribute("aria-expanded", "true");
+      } else {
+        storyFull.setAttribute("hidden", "");
+        storyShort.removeAttribute("hidden");
+        storyToggle.textContent = "Read full story";
+        storyToggle.setAttribute("aria-expanded", "false");
+      }
+    });
+  }
+
+  var credLb = document.getElementById("cert-lightbox");
+  var credOpen = document.querySelector("[data-cred-open]");
+  if (credLb && credOpen) {
+    var showCred = function () { credLb.removeAttribute("hidden"); document.body.style.overflow = "hidden"; };
+    var hideCred = function () { credLb.setAttribute("hidden", ""); document.body.style.overflow = ""; };
+    credOpen.addEventListener("click", showCred);
+    Array.prototype.forEach.call(credLb.querySelectorAll("[data-cred-close]"), function (el) { el.addEventListener("click", hideCred); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !credLb.hasAttribute("hidden")) hideCred(); });
+  }
+
   var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var reveals = Array.prototype.slice.call(document.querySelectorAll(".reveal"));
 
@@ -51,12 +74,11 @@
     entries.forEach(function (entry) {
       if (!entry.isIntersecting) return;
       var el = entry.target;
-      // stagger siblings that reveal together
       var siblings = Array.prototype.slice.call(
         el.parentElement ? el.parentElement.querySelectorAll(":scope > .reveal") : [el]
       );
       var idx = Math.max(0, siblings.indexOf(el));
-      el.style.transitionDelay = Math.min(idx * 70, 350) + "ms";
+      el.style.transitionDelay = Math.min(idx * 80, 420) + "ms";
       el.classList.add("is-visible");
       io.unobserve(el);
     });
