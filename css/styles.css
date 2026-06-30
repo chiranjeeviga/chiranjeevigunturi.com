@@ -271,3 +271,136 @@ em { font-style: italic; }
   .btn:hover, .product__link:hover { transform: none; }
   * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
 }
+
+/* ------------------------------------------------------------------ *
+ * Story highlights + popovers (Medium-style "read the depth")
+ * A .hl is a real <button> styled as an inline highlight, not a link.
+ * ------------------------------------------------------------------ */
+.hl {
+  /* reset button chrome -> inline text */
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  margin: 0;
+  padding: 0 0.04em;
+  cursor: pointer;
+  display: inline;
+  -webkit-appearance: none;
+  appearance: none;
+  /* the highlight look: soft ink underline, faint warm wash */
+  background-image: linear-gradient(var(--bg-panel), var(--bg-panel));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 0.92em;
+  box-shadow: inset 0 -0.07em 0 oklch(0.205 0.004 260 / 0.32);
+  border-radius: 2px;
+  transition: box-shadow 0.16s ease, background-size 0.16s ease, color 0.16s ease;
+}
+.hl::after {
+  /* tiny "+" affordance so it reads as expandable, not a link */
+  content: "\002B";
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.62em;
+  line-height: 1;
+  vertical-align: 0.45em;
+  margin-left: 0.12em;
+  opacity: 0.55;
+  transition: opacity 0.16s ease;
+}
+.hl:hover,
+.hl:focus-visible {
+  box-shadow: inset 0 -0.5em 0 oklch(0.205 0.004 260 / 0.10), inset 0 -0.07em 0 var(--ink);
+  outline: none;
+}
+.hl:hover::after,
+.hl:focus-visible::after { opacity: 0.9; }
+.hl[aria-expanded="true"] {
+  box-shadow: inset 0 -0.5em 0 oklch(0.205 0.004 260 / 0.14), inset 0 -0.09em 0 var(--ink);
+}
+.hl:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; border-radius: 2px; }
+
+/* the offscreen store never shows; JS moves a clone/positions the node */
+.pop-store { position: absolute; left: -9999px; }
+
+/* a popover card */
+.pop {
+  position: absolute;
+  z-index: 60;
+  width: min(30rem, calc(100vw - 2 * var(--space-lg)));
+  max-width: 30rem;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow:
+    0 1px 2px oklch(0.205 0.004 260 / 0.06),
+    0 12px 28px -8px oklch(0.205 0.004 260 / 0.22);
+  padding: var(--space-lg) var(--space-lg) calc(var(--space-lg) - 4px);
+  /* enter animation */
+  opacity: 0;
+  transform: translateY(4px) scale(0.99);
+  transition: opacity 0.14s ease, transform 0.14s ease;
+}
+.pop.is-open { opacity: 1; transform: translateY(0) scale(1); }
+.pop__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.92rem;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin: 0 var(--space-lg) var(--space-sm) 0; /* room for close btn */
+  line-height: 1.25;
+}
+.pop__body { font-size: 0.9rem; line-height: 1.62; color: var(--ink-soft); }
+.pop__body p { margin: 0 0 var(--space-sm); }
+.pop__body p:last-child { margin-bottom: 0; }
+.pop__close {
+  position: absolute;
+  top: 8px; right: 10px;
+  width: 28px; height: 28px;
+  display: grid; place-items: center;
+  font: inherit; font-size: 1.25rem; line-height: 1;
+  color: var(--ink-soft);
+  background: transparent; border: 0; border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.14s ease, color 0.14s ease;
+}
+.pop__close:hover { background: var(--bg-panel); color: var(--ink); }
+.pop__close:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; }
+
+/* little arrow pointing back to the highlight */
+.pop::before {
+  content: "";
+  position: absolute;
+  left: var(--arrow-x, 50%);
+  margin-left: -6px;
+  width: 12px; height: 12px;
+  background: var(--paper);
+  border-left: 1px solid var(--line);
+  border-top: 1px solid var(--line);
+  transform: rotate(45deg);
+}
+.pop[data-side="bottom"]::before { top: -7px; }
+.pop[data-side="top"]::before    { bottom: -7px; border-left: 0; border-top: 0; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+
+/* mobile: dock to a centered sheet near the bottom rather than float */
+@media (max-width: 640px) {
+  .pop {
+    position: fixed;
+    left: var(--space-md) !important;
+    right: var(--space-md);
+    top: auto !important;
+    bottom: var(--space-lg);
+    width: auto;
+    max-width: none;
+    transform: translateY(8px);
+  }
+  .pop.is-open { transform: translateY(0); }
+  .pop::before { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pop { transition: opacity 0.001ms; transform: none !important; }
+  .hl { transition: none; }
+}

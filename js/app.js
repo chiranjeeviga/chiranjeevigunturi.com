@@ -62,6 +62,112 @@
     document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !credLb.hasAttribute("hidden")) hideCred(); });
   }
 
+  /* ---- Story highlight popovers ---------------------------------- *
+   * Each .hl button references a .pop card (by data-pop -> #pop-<id>).
+   * The same card can be referenced by more than one highlight; we move
+   * each card to <body> once, then position it per click. One open at a
+   * time; close on the card's button, click-away, Esc, or scroll/resize.
+   * --------------------------------------------------------------- */
+  (function () {
+    var hls = Array.prototype.slice.call(document.querySelectorAll(".hl[data-pop]"));
+    if (!hls.length) return;
+    var GAP = 10;          // space between highlight and card
+    var EDGE = 12;         // viewport edge padding
+    var openPop = null;    // currently-open .pop
+    var openHl = null;     // highlight that opened it
+    var isMobile = function () { return window.matchMedia("(max-width: 640px)").matches; };
+
+    // hoist every referenced card to <body> so positioning is page-relative
+    var cards = {};
+    hls.forEach(function (hl) {
+      var id = hl.getAttribute("data-pop");
+      if (cards[id]) return;
+      var card = document.getElementById("pop-" + id);
+      if (!card) return;
+      document.body.appendChild(card);   // out of the hidden store
+      cards[id] = card;
+      // wire its close button
+      var x = card.querySelector(".pop__close");
+      if (x) x.addEventListener("click", function (e) { e.stopPropagation(); close(); });
+      // clicks inside the card shouldn't bubble to the document-close handler
+      card.addEventListener("click", function (e) { e.stopPropagation(); });
+    });
+
+    function position(card, hl) {
+      if (isMobile()) { card.removeAttribute("data-side"); return; } // CSS docks it
+      var r = hl.getBoundingClientRect();
+      var cw = card.offsetWidth, ch = card.offsetHeight;
+      var sx = window.pageXOffset, sy = window.pageYOffset;
+      var vw = document.documentElement.clientWidth;
+
+      // horizontal: center on the highlight, clamp to viewport
+      var left = r.left + sx + r.width / 2 - cw / 2;
+      left = Math.max(sx + EDGE, Math.min(left, sx + vw - cw - EDGE));
+
+      // vertical: prefer below; flip above if not enough room
+      var below = r.bottom + GAP + ch <= window.innerHeight - EDGE;
+      var top = below ? (r.bottom + sy + GAP) : (r.top + sy - ch - GAP);
+      card.setAttribute("data-side", below ? "bottom" : "top");
+
+      // arrow x: point at the highlight's center, within the card
+      var arrowX = (r.left + sx + r.width / 2) - left;
+      arrowX = Math.max(16, Math.min(arrowX, cw - 16));
+      card.style.setProperty("--arrow-x", arrowX + "px");
+
+      card.style.left = left + "px";
+      card.style.top = top + "px";
+    }
+
+    function open(hl) {
+      var id = hl.getAttribute("data-pop");
+      var card = cards[id];
+      if (!card) return;
+      if (openPop === card) { close(); return; } // toggle off
+      close();
+      card.removeAttribute("hidden");
+      position(card, hl);
+      // next frame -> trigger enter transition
+      requestAnimationFrame(function () { card.classList.add("is-open"); });
+      hl.setAttribute("aria-expanded", "true");
+      openPop = card; openHl = hl;
+    }
+
+    function close() {
+      if (!openPop) return;
+      openPop.classList.remove("is-open");
+      var card = openPop, hl = openHl;
+      // hide after the transition so it's removed from a11y tree
+      window.setTimeout(function () {
+        if (!card.classList.contains("is-open")) card.setAttribute("hidden", "");
+      }, 180);
+      if (hl) hl.setAttribute("aria-expanded", "false");
+      openPop = null; openHl = null;
+    }
+
+    hls.forEach(function (hl) {
+      hl.addEventListener("click", function (e) { e.stopPropagation(); open(hl); });
+    });
+
+    // close on click-away, Esc; reposition on scroll/resize
+    document.addEventListener("click", function () { close(); });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && openPop) {
+        var hl = openHl;        // capture before close() nulls it
+        close();
+        if (hl) hl.focus();
+      }
+    });
+    var reflow = function () {
+      if (!openPop || !openHl) return;
+      if (isMobile()) return;             // docked; nothing to recompute
+      position(openPop, openHl);
+    };
+    window.addEventListener("scroll", reflow, { passive: true });
+    window.addEventListener("resize", function () {
+      if (openPop) close();               // simplest: close on resize
+    });
+  })();
+
   var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var reveals = Array.prototype.slice.call(document.querySelectorAll(".reveal"));
 
