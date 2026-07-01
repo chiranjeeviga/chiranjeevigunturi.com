@@ -1,10 +1,16 @@
 (function () {
   "use strict";
   if (window.rough) {
-    var inkColor = getComputedStyle(document.documentElement).getPropertyValue("--ink").trim() || "#24262e";
+    // Icons bake stroke colours at draw time, so a theme flip must REDRAW them.
+    // Everything below runs inside render(), which re-reads the tokens fresh and
+    // clears each SVG first; it runs on load and again on the "themechange" event.
+    var render = function () {
+    var css = getComputedStyle(document.documentElement);
+    var inkColor = css.getPropertyValue("--ink").trim() || "#24262e";
     var drawInto = function (id, fn) {
       var svg = document.getElementById(id);
       if (!svg) return;
+      while (svg.firstChild) svg.removeChild(svg.firstChild); // clear before redraw
       var rc = rough.svg(svg);
       fn(rc, function (node) { svg.appendChild(node); });
     };
@@ -40,7 +46,7 @@
       add(rc.line(11, 27.5, 53, 27.5, S(R, 1.5, 43)));
       add(rc.rectangle(17, 33, 9, 7, S(R, 1.5, 44)));
     });
-    var inkSoft = getComputedStyle(document.documentElement).getPropertyValue("--ink-soft").trim() || "#5a5e6b";
+    var inkSoft = css.getPropertyValue("--ink-soft").trim() || "#5a5e6b";
     var Ssoft = function (r, w, seed, bow) { return { roughness: r, stroke: inkSoft, strokeWidth: w || 1.5, bowing: bow == null ? 1.2 : bow, seed: seed || 1 }; };
     var SoftSolid = function (seed) { return { roughness: 0.8, stroke: inkSoft, strokeWidth: 0.5, fill: inkSoft, fillStyle: "solid", seed: seed || 1 }; };
     drawInto("m-icon-1", function (rc, add) {
@@ -71,14 +77,20 @@
       add(rc.circle(32, 28, 2.6, SoftSolid(91)));
       add(rc.circle(40, 28, 2.6, SoftSolid(92)));
     });
-    var beats = document.querySelectorAll(".prose .beat");
+    // beat dividers bake inkColor -> redraw on theme flip. Reuse the existing
+    // <svg> if already inserted (guard against duplicates on re-render).
     var SVGNS = "http://www.w3.org/2000/svg";
-    Array.prototype.forEach.call(beats, function (beat, i) {
-      var svg = document.createElementNS(SVGNS, "svg");
-      svg.setAttribute("class", "sketch-divider");
-      svg.setAttribute("viewBox", "0 0 60 10");
-      svg.setAttribute("aria-hidden", "true");
-      beat.parentNode.insertBefore(svg, beat);
+    Array.prototype.forEach.call(document.querySelectorAll(".prose .beat"), function (beat) {
+      var svg = beat.previousElementSibling;
+      if (!svg || !svg.classList || !svg.classList.contains("sketch-divider")) {
+        svg = document.createElementNS(SVGNS, "svg");
+        svg.setAttribute("class", "sketch-divider");
+        svg.setAttribute("viewBox", "0 0 60 10");
+        svg.setAttribute("aria-hidden", "true");
+        beat.parentNode.insertBefore(svg, beat);
+      } else {
+        while (svg.firstChild) svg.removeChild(svg.firstChild);
+      }
       var rc = rough.svg(svg);
       svg.appendChild(rc.line(3, 5, 57, 5, { roughness: 0.9, stroke: inkColor, strokeWidth: 1.4, bowing: 2.5, seed: 101 }));
     });
@@ -124,11 +136,19 @@
       }
     };
 
+    // tab glyphs use "currentColor" -> CSS themes them for free, so draw ONCE.
     Array.prototype.forEach.call(document.querySelectorAll(".pop__tab-ico[data-icon]"), function (svg) {
+      if (svg.getAttribute("data-drawn")) return;
       var fn = tabIcons[svg.getAttribute("data-icon")];
       if (!fn) return;
       var rc = rough.svg(svg);
       fn(rc, function (node) { svg.appendChild(node); }, svg);
+      svg.setAttribute("data-drawn", "1");
     });
+    }; // end render()
+
+    render();
+    // the theme toggle dispatches "themechange" on <html>; redraw baked icons
+    document.documentElement.addEventListener("themechange", render);
   }
 })();

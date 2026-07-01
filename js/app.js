@@ -31,6 +31,26 @@
     });
   }
 
+  /* ---- Theme toggle (light default, dark opt-in, remembered) ------ */
+  var themeBtn = document.getElementById("theme-toggle");
+  if (themeBtn) {
+    var root = document.documentElement;
+    var syncThemeBtn = function () {
+      var dark = root.getAttribute("data-theme") === "dark";
+      themeBtn.setAttribute("aria-pressed", String(dark));
+      themeBtn.setAttribute("aria-label", dark ? "Switch to light theme" : "Switch to dark theme");
+    };
+    syncThemeBtn(); // reflect whatever the no-flash script set
+    themeBtn.addEventListener("click", function () {
+      var dark = root.getAttribute("data-theme") === "dark";
+      if (dark) { root.removeAttribute("data-theme"); } else { root.setAttribute("data-theme", "dark"); }
+      try { localStorage.setItem("theme", dark ? "light" : "dark"); } catch (e) {}
+      syncThemeBtn();
+      // tell icons.js to redraw the rough.js glyphs that bake their colour
+      root.dispatchEvent(new Event("themechange"));
+    });
+  }
+
   var storyToggle = document.getElementById("story-toggle");
   var storyShort = document.getElementById("story-short");
   var storyFull = document.getElementById("story-full");
