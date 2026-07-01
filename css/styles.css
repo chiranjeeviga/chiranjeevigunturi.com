@@ -578,3 +578,25 @@ em { font-style: italic; }
   color: var(--ink) !important;
   text-wrap: pretty;
 }
+/* personal sign-off: the last human beat before the footer */
+.signoff {
+  text-align: center;
+  margin: 0 auto;
+  padding: var(--space-2xl) var(--space-lg) var(--space-3xl);
+}
+.signoff__line {
+  margin: 0;
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--muted);
+}
+.signoff__name {
+  margin: 0.15em 0 0;
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(1.6rem, 1vw + 1.3rem, 2.1rem);
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
