@@ -670,3 +670,20 @@ em { font-style: italic; }
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
 }
+/* .par a = an external citation/reference link inside a PAR block (e.g. a
+   DBS newsroom source). A plain underlined link in the soft ink, so it is
+   clearly a link yet distinct from the .hl depth-chip and the .kw wash. */
+.par a {
+  color: var(--ink-soft);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in oklch, var(--ink) 35%, transparent);
+  text-underline-offset: 0.15em;
+  text-decoration-thickness: 1px;
+  transition: color 0.16s ease, text-decoration-color 0.16s ease;
+}
+.par a:hover,
+.par a:focus-visible {
+  color: var(--ink);
+  text-decoration-color: var(--ink);
+}
+.par a:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; border-radius: 2px; }
