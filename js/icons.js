@@ -133,6 +133,24 @@
         // door
         add(rc.rectangle(10, 13, 4, 7, St(214, 1.3)));
         add(rc.circle(12.9, 16.7, 0.7, Fill(215)));
+      },
+      // social: a small network of connected people (community + network effects)
+      social: function (rc, add) {
+        // links between the nodes
+        add(rc.line(7.5, 8.5, 12, 15, St(221, 1.2, 0.6)));
+        add(rc.line(16.5, 8.5, 12, 15, St(222, 1.2, 0.6)));
+        add(rc.line(7.5, 8.5, 16.5, 8.5, St(223, 1.2, 0)));
+        // three nodes (people)
+        add(rc.circle(7.5, 8, 4.2, St(224, 1.4)));
+        add(rc.circle(16.5, 8, 4.2, St(225, 1.4)));
+        add(rc.circle(12, 16.5, 4.6, St(226, 1.4)));
+      },
+      // commerce: a shopping bag (reselling to members -> social commerce)
+      commerce: function (rc, add) {
+        // bag body
+        add(rc.path("M5 8 L19 8 L17.8 20 L6.2 20 Z", St(231, 1.5)));
+        // handle
+        add(rc.path("M8.7 8 C 8.7 4.5 15.3 4.5 15.3 8", St(232, 1.3, 0.4)));
       }
     };
 
