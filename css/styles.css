@@ -543,6 +543,29 @@ em { font-style: italic; }
 }
 .par p:not(.par__label) { margin: 0 0 var(--space-xs); font-size: 0.96rem; line-height: 1.68; color: var(--ink-soft); }
 .par p:not(.par__label):last-child { margin-bottom: 0; }
+/* "What I did" reads as moves, not prose: a tucked-in list, same voice as .par p */
+.par__list { margin: 0; padding: 0; list-style: none; }
+.par__list li {
+  position: relative;
+  margin: 0 0 var(--space-sm);
+  padding-left: var(--space-md);
+  font-size: 0.96rem;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  text-wrap: pretty;
+}
+.par__list li:last-child { margin-bottom: 0; }
+.par__list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--muted);
+}
+.par__list b { color: var(--ink); font-weight: 600; }
 /* the design question that closes a "problem" block: set apart, in the reader's face */
 .par__q {
   margin-top: var(--space-sm) !important;
