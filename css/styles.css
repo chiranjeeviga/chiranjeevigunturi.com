@@ -336,40 +336,48 @@ em { font-style: italic; }
   display: inline;
   -webkit-appearance: none;
   appearance: none;
-  /* the highlight look: a visible highlighter band + ink underline, so it
-     clearly reads as tappable at rest (not a faint hint people miss).
-     Uses --ink so it inverts correctly in dark mode. */
-  background-image: linear-gradient(color-mix(in oklch, var(--ink) 11%, transparent), color-mix(in oklch, var(--ink) 11%, transparent));
-  background-repeat: no-repeat;
-  background-position: 0 100%;
-  background-size: 100% 0.62em;
-  box-shadow: inset 0 -0.1em 0 color-mix(in oklch, var(--ink) 55%, transparent);
-  border-radius: 2px;
-  transition: box-shadow 0.16s ease, background-size 0.16s ease, color 0.16s ease;
+  /* Secondary-action "chip": a tinted rounded pill + border + "+", so it
+     reads unmistakably as a tappable control at rest, yet stays calm
+     enough to repeat several times inside one paragraph. All tints are
+     mixed off --ink, so the chip inverts correctly in dark mode. */
+  padding: 0.06em 0.42em 0.06em 0.4em;
+  border-radius: 0.7em;
+  background-color: color-mix(in oklch, var(--ink) 8%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--ink) 22%, transparent);
+  transition: background-color 0.16s ease, box-shadow 0.16s ease, color 0.16s ease;
+  /* multi-word chips (e.g. "conversational-banking chatbot") may wrap near
+     the margin; clone keeps the pill fill + border intact on both fragments */
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 .hl::after {
-  /* "+" affordance so it reads as expandable, not a link; visible at rest */
+  /* "+" affordance so it reads as expandable/openable, visible at rest */
   content: "\002B";
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 0.64em;
+  font-size: 0.66em;
   line-height: 1;
-  vertical-align: 0.45em;
-  margin-left: 0.14em;
-  opacity: 0.8;
+  vertical-align: 0.08em;
+  margin-left: 0.28em;
+  opacity: 0.7;
   transition: opacity 0.16s ease;
 }
 .hl:hover,
 .hl:focus-visible {
-  box-shadow: inset 0 -0.5em 0 color-mix(in oklch, var(--ink) 12%, transparent), inset 0 -0.09em 0 var(--ink);
+  background-color: color-mix(in oklch, var(--ink) 15%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--ink) 40%, transparent);
   outline: none;
 }
 .hl:hover::after,
 .hl:focus-visible::after { opacity: 1; }
 .hl[aria-expanded="true"] {
-  box-shadow: inset 0 -0.5em 0 color-mix(in oklch, var(--ink) 16%, transparent), inset 0 -0.11em 0 var(--ink);
+  /* opened: filled solid, inverted text, so the active depth source is obvious */
+  background-color: var(--ink);
+  color: var(--bg);
+  box-shadow: inset 0 0 0 1px var(--ink);
 }
-.hl:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; border-radius: 2px; }
+.hl[aria-expanded="true"]::after { opacity: 0.85; }
+.hl:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 
 /* the offscreen store never shows; JS moves cards into the drawer panel */
 .pop-store { position: absolute; left: -9999px; }
