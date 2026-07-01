@@ -600,3 +600,15 @@ em { font-style: italic; }
   color: var(--ink);
   letter-spacing: -0.01em;
 }
+/* .kw = one keyword highlight per PAR block (site-wide, controlled list).
+   A passive highlighter wash: NO underline, NO "+", NO hover, so it never
+   reads as clickable like .hl. Monochrome, on-palette. Reset <mark> defaults. */
+.kw {
+  background: oklch(0.205 0.004 260 / 0.09);
+  box-shadow: 0 0 0 0.12em oklch(0.205 0.004 260 / 0.09);
+  color: inherit;
+  border-radius: 2px;
+  padding: 0 0.02em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
