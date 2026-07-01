@@ -343,11 +343,11 @@ em { font-style: italic; }
      so it inverts correctly in dark mode. */
   background-image: linear-gradient(color-mix(in oklch, var(--ink) 20%, transparent), color-mix(in oklch, var(--ink) 20%, transparent));
   background-repeat: no-repeat;
-  background-position: 0 100%;
-  background-size: 100% 0.72em;
+  background-position: 0 0;
+  background-size: 100% 100%;
   box-shadow: inset 0 -0.12em 0 var(--ink);
-  border-radius: 2px 2px 0 0;
-  transition: box-shadow 0.16s ease, background-size 0.16s ease, color 0.16s ease;
+  border-radius: 2px;
+  transition: box-shadow 0.16s ease, background-color 0.16s ease, color 0.16s ease;
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
 }
@@ -365,17 +365,16 @@ em { font-style: italic; }
 }
 .hl:hover,
 .hl:focus-visible {
-  /* band swells to full height + underline thickens -> obviously active */
-  background-size: 100% 100%;
+  /* full-height already; deepen the tint + thicken the underline -> active */
+  background-image: linear-gradient(color-mix(in oklch, var(--ink) 28%, transparent), color-mix(in oklch, var(--ink) 28%, transparent));
   box-shadow: inset 0 -0.14em 0 var(--ink);
   outline: none;
 }
 .hl:hover::after,
 .hl:focus-visible::after { opacity: 1; }
 .hl[aria-expanded="true"] {
-  /* opened: full-height saturated band, so the active depth source stands out */
-  background-image: linear-gradient(color-mix(in oklch, var(--ink) 32%, transparent), color-mix(in oklch, var(--ink) 32%, transparent));
-  background-size: 100% 100%;
+  /* opened: deepest tint, so the active depth source stands out */
+  background-image: linear-gradient(color-mix(in oklch, var(--ink) 38%, transparent), color-mix(in oklch, var(--ink) 38%, transparent));
   box-shadow: inset 0 -0.14em 0 var(--ink);
 }
 .hl:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
