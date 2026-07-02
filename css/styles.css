@@ -251,7 +251,10 @@ em { font-style: italic; }
 .ways { margin-top: var(--space-3xl); max-width: var(--measure); }
 .ways__title { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.1rem, 1vw + 0.8rem, 1.4rem); letter-spacing: -0.02em; margin-bottom: var(--space-sm); }
 .ways p { color: var(--ink-soft); }
+.ways p + p { margin-top: var(--space-sm); }
 .ways strong { color: var(--ink); font-weight: 600; }
+.ways__note { font-size: 0.9rem; border-top: 1px solid var(--line); padding-top: var(--space-sm); }
+.ways p + p.ways__note { margin-top: var(--space-md); }
 
 .depth { max-width: var(--maxw); margin-inline: auto; padding-inline: clamp(var(--space-lg), 5vw, var(--space-4xl)); padding-top: clamp(var(--space-4xl), 9vw, var(--space-5xl)); }
 .depth-grid { list-style: none; padding: 0; margin: var(--space-2xl) 0 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-xl) var(--space-2xl); }
