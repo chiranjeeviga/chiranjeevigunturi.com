@@ -239,6 +239,9 @@ em { font-style: italic; }
 .product__desc { color: var(--ink-soft); max-width: 54ch; }
 .product__link { display: inline-block; margin-top: var(--space-md); font-family: var(--font-display); font-weight: 600; font-size: 0.95rem; color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--line); padding-bottom: 1px; transition: border-color 0.2s var(--ease); }
 .product__link:hover { border-bottom-color: var(--ink); }
+.product__proof { margin-top: var(--space-xs); font-size: 0.9rem; color: var(--ink-soft); }
+.product__proof a { color: var(--ink-soft); text-decoration: underline; text-underline-offset: 2px; }
+.product__proof a:hover { color: var(--ink); }
 
 .offers { list-style: none; padding: 0; margin: var(--space-2xl) 0 0; }
 .offer { display: grid; grid-template-columns: minmax(0, 80px) 1fr; gap: clamp(var(--space-md), 3vw, var(--space-2xl)); padding: var(--space-2xl) 0; border-top: 1px solid var(--line); }
